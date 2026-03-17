@@ -311,17 +311,28 @@
             vcf += `ORG:${CONTACT_DATA.organization}\n`;
             vcf += `TITLE:${CONTACT_DATA.title}\n`;
             vcf += `TEL;TYPE=CELL,VOICE:${CONTACT_DATA.phone}\n`;
-            vcf += `TEL;TYPE=WORK,VOICE:${CONTACT_DATA.whatsapp}\n`; // Secondary number
+            vcf += `TEL;TYPE=WORK,VOICE:${CONTACT_DATA.whatsapp}\n`; 
             
-            // Standard Website field
-            vcf += `URL;TYPE=WORK:${CONTACT_DATA.website}\n`;
+            // Website field (Primary)
+            vcf += `URL;TYPE=WORK;LABEL=Website:${CONTACT_DATA.website}\n`;
             
-            // X-SOCIALPROFILE tags (Supported by iOS and some Android contacts)
+            // Categorized URLs (Supported by most modern contact apps)
+            vcf += `URL;TYPE=WORK;LABEL=Properties:${CONTACT_DATA.properties}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Location:${CONTACT_DATA.location}\n`;
+            
+            // Social Media as individual URLs
+            vcf += `URL;TYPE=WORK;LABEL=LinkedIn:${CONTACT_DATA.socials.linkedin}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Instagram:${CONTACT_DATA.socials.instagram}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Facebook:${CONTACT_DATA.socials.facebook}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=TikTok:${CONTACT_DATA.socials.tiktok}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Telegram:${CONTACT_DATA.socials.telegram}\n`;
+            
+            // Social Profiles (Specific tags for iOS)
             vcf += `X-SOCIALPROFILE;TYPE=linkedin:${CONTACT_DATA.socials.linkedin}\n`;
             vcf += `X-SOCIALPROFILE;TYPE=facebook:${CONTACT_DATA.socials.facebook}\n`;
             vcf += `X-SOCIALPROFILE;TYPE=instagram:${CONTACT_DATA.socials.instagram}\n`;
             
-            // Note field: The fallback directory where all links are guaranteed functional
+            // Note field as fallback directory
             let note = "DIRECTORY OF LINKS:\\n\\n";
             note += `Main Website: ${CONTACT_DATA.website}\\n`;
             note += `Office Location: ${CONTACT_DATA.location}\\n`;
@@ -349,7 +360,7 @@
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
-            showMessage('Contact card (.vcf) with functional links ready!');
+            showMessage('Contact card (.vcf) with separated links ready!');
         });
     </script>
 </body>
