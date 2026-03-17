@@ -303,7 +303,7 @@
         };
 
         document.getElementById('vcfButton').addEventListener('click', () => {
-            // Build the vCard string
+            // Build the vCard string using standard grouping to ensure labels are honored
             let vcf = "BEGIN:VCARD\n";
             vcf += "VERSION:3.0\n";
             vcf += `FN:${CONTACT_DATA.name}\n`;
@@ -313,22 +313,31 @@
             vcf += `TEL;TYPE=CELL,VOICE:${CONTACT_DATA.phone}\n`;
             vcf += `TEL;TYPE=WORK,VOICE:${CONTACT_DATA.whatsapp}\n`; 
             
-            // Website field (Primary)
-            vcf += `URL;TYPE=WORK;LABEL=Website:${CONTACT_DATA.website}\n`;
-            
-            // Categorized URLs using the LABEL property for descriptive display names
-            vcf += `URL;TYPE=WORK;LABEL=Properties:${CONTACT_DATA.properties}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Location:${CONTACT_DATA.location}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=LinkedIn:${CONTACT_DATA.socials.linkedin}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Instagram:${CONTACT_DATA.socials.instagram}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Facebook:${CONTACT_DATA.socials.facebook}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=TikTok:${CONTACT_DATA.socials.tiktok}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Telegram:${CONTACT_DATA.socials.telegram}\n`;
-            
-            // Social Profiles (Specific tags for iOS and modern Android)
-            vcf += `X-SOCIALPROFILE;TYPE=linkedin:${CONTACT_DATA.socials.linkedin}\n`;
-            vcf += `X-SOCIALPROFILE;TYPE=facebook:${CONTACT_DATA.socials.facebook}\n`;
-            vcf += `X-SOCIALPROFILE;TYPE=instagram:${CONTACT_DATA.socials.instagram}\n`;
+            // Standard URL grouping (itemX.URL + itemX.X-ABLabel) 
+            // This is the most compatible way to show custom names instead of "website"
+            vcf += `item1.URL:${CONTACT_DATA.website}\n`;
+            vcf += `item1.X-ABLabel:Official Website\n`;
+
+            vcf += `item2.URL:${CONTACT_DATA.location}\n`;
+            vcf += `item2.X-ABLabel:Office Location\n`;
+
+            vcf += `item3.URL:${CONTACT_DATA.properties}\n`;
+            vcf += `item3.X-ABLabel:Properties\n`;
+
+            vcf += `item4.URL:${CONTACT_DATA.socials.linkedin}\n`;
+            vcf += `item4.X-ABLabel:LinkedIn\n`;
+
+            vcf += `item5.URL:${CONTACT_DATA.socials.instagram}\n`;
+            vcf += `item5.X-ABLabel:Instagram\n`;
+
+            vcf += `item6.URL:${CONTACT_DATA.socials.facebook}\n`;
+            vcf += `item6.X-ABLabel:Facebook\n`;
+
+            vcf += `item7.URL:${CONTACT_DATA.socials.tiktok}\n`;
+            vcf += `item7.X-ABLabel:TikTok\n`;
+
+            vcf += `item8.URL:${CONTACT_DATA.socials.telegram}\n`;
+            vcf += `item8.X-ABLabel:Telegram\n`;
             
             // Note field as fallback directory
             let note = "DIRECTORY OF LINKS:\\n\\n";
@@ -358,7 +367,7 @@
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
-            showMessage('Contact card (.vcf) with labeled links saved!');
+            showMessage('Contact saved with custom link names!');
         });
     </script>
 </body>
