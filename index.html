@@ -313,17 +313,19 @@
             vcf += `TEL;TYPE=CELL,VOICE:${CONTACT_DATA.phone}\n`;
             vcf += `TEL;TYPE=WORK,VOICE:${CONTACT_DATA.whatsapp}\n`; 
             
-            // Separated URLs with specific labels instead of generic "Website"
-            vcf += `URL;TYPE=WORK;LABEL=Official Website:${CONTACT_DATA.website}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Properties Directory:${CONTACT_DATA.properties}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Office Location:${CONTACT_DATA.location}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=LinkedIn Profile:${CONTACT_DATA.socials.linkedin}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Instagram Profile:${CONTACT_DATA.socials.instagram}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Facebook Page:${CONTACT_DATA.socials.facebook}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=TikTok Channel:${CONTACT_DATA.socials.tiktok}\n`;
-            vcf += `URL;TYPE=WORK;LABEL=Telegram Channel:${CONTACT_DATA.socials.telegram}\n`;
+            // Website field (Primary)
+            vcf += `URL;TYPE=WORK;LABEL=Website:${CONTACT_DATA.website}\n`;
             
-            // X-SOCIALPROFILE tags for specific native integration (iOS/High-end Android)
+            // Categorized URLs using the LABEL property for descriptive display names
+            vcf += `URL;TYPE=WORK;LABEL=Properties:${CONTACT_DATA.properties}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Location:${CONTACT_DATA.location}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=LinkedIn:${CONTACT_DATA.socials.linkedin}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Instagram:${CONTACT_DATA.socials.instagram}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Facebook:${CONTACT_DATA.socials.facebook}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=TikTok:${CONTACT_DATA.socials.tiktok}\n`;
+            vcf += `URL;TYPE=WORK;LABEL=Telegram:${CONTACT_DATA.socials.telegram}\n`;
+            
+            // Social Profiles (Specific tags for iOS and modern Android)
             vcf += `X-SOCIALPROFILE;TYPE=linkedin:${CONTACT_DATA.socials.linkedin}\n`;
             vcf += `X-SOCIALPROFILE;TYPE=facebook:${CONTACT_DATA.socials.facebook}\n`;
             vcf += `X-SOCIALPROFILE;TYPE=instagram:${CONTACT_DATA.socials.instagram}\n`;
@@ -356,7 +358,7 @@
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
-            showMessage('Contact card (.vcf) with labeled links ready!');
+            showMessage('Contact card (.vcf) with labeled links saved!');
         });
     </script>
 </body>
