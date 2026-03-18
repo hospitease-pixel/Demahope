@@ -54,7 +54,6 @@
         </div>
     </div>
 
-    <!-- Admin Access Trigger -->
     <button id="authBtn" class="fixed top-4 right-4 bg-gray-800/80 backdrop-blur-sm text-white p-2 rounded-full shadow-lg z-50 hover:bg-gray-700">
         <i data-lucide="lock" class="w-5 h-5"></i>
     </button>
@@ -86,7 +85,10 @@
                 <h3 class="font-bold text-blue-600 border-b pb-1 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Identity</h3>
                 <div class="space-y-3">
                     <label class="block text-xs font-bold uppercase text-gray-400">Profile Image</label>
-                    <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm">
+                    <div class="flex items-center gap-4 p-2 bg-gray-50 rounded-lg">
+                        <img id="editImagePreview" src="" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm bg-gray-200">
+                        <input type="file" id="imageUpload" accept="image/*" class="w-full text-xs">
+                    </div>
                     <input type="text" id="editName" placeholder="Full Name" class="w-full p-2 border rounded">
                     <input type="text" id="editOrg" placeholder="Organization" class="w-full p-2 border rounded">
                     <input type="text" id="editTitle" placeholder="Job Title" class="w-full p-2 border rounded">
@@ -266,15 +268,12 @@
             document.getElementById('loadingOverlay').classList.add('hidden-view');
         }
 
-        // Initialize App with error safety
         try {
             if (firebaseConfig.apiKey) {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-
                 signInAnonymously(auth).catch(console.error);
-                
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         const docRef = doc(db, 'profiles', appIdPrefix);
@@ -283,20 +282,18 @@
                                 CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
                                 updateCardUI();
                             }
-                        }, (err) => console.warn("Firestore access restricted or not configured yet."));
+                        }, (err) => console.warn("Firestore access error"));
                     }
                 });
             } else {
-                console.warn("Firebase not configured. Using default static data.");
                 setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden-view'), 1000);
             }
         } catch (e) {
-            console.error("Firebase init failed", e);
+            console.error(e);
         }
 
         updateCardUI();
 
-        // Global functions for UI
         window.toggleView = (view) => {
             document.getElementById('cardView').classList.add('hidden-view');
             document.getElementById('loginView').classList.add('hidden-view');
@@ -321,7 +318,6 @@
 
         document.getElementById('logoutBtn').onclick = () => window.toggleView('card');
 
-        // Form Management
         window.removeParent = (btn) => btn.parentElement.remove();
 
         function createPhoneItem(val = "") {
@@ -372,6 +368,7 @@
             document.getElementById('editWebsite').value = CONTACT_DATA.website || "";
             document.getElementById('editLocation').value = CONTACT_DATA.location || "";
             document.getElementById('editPassword').value = CONTACT_DATA.adminPassword || "";
+            document.getElementById('editImagePreview').src = CONTACT_DATA.image || "";
             
             const phonesEditor = document.getElementById('phonesEditor');
             phonesEditor.innerHTML = "";
@@ -386,12 +383,18 @@
             (CONTACT_DATA.customLinks || []).forEach(l => customEditor.appendChild(createCustomLinkItem(l.label, l.url)));
         }
 
+        // Global variable to hold the new image string
         let tempImageBase64 = null;
+
         document.getElementById('imageUpload').onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (event) => tempImageBase64 = event.target.result;
+                reader.onload = (event) => {
+                    tempImageBase64 = event.target.result;
+                    // Update preview in the editor immediately
+                    document.getElementById('editImagePreview').src = tempImageBase64;
+                };
                 reader.readAsDataURL(file);
             }
         };
@@ -407,6 +410,7 @@
                 url: div.querySelector('.custom-url').value.trim()
             })).filter(l => l.label && l.url);
 
+            // Create the updated data object
             const upData = {
                 ...CONTACT_DATA,
                 name: document.getElementById('editName').value,
@@ -416,18 +420,23 @@
                 website: document.getElementById('editWebsite').value,
                 location: document.getElementById('editLocation').value,
                 adminPassword: document.getElementById('editPassword').value || CONTACT_DATA.adminPassword,
-                image: tempImageBase64 || CONTACT_DATA.image,
                 phones: phones,
                 socialLinks: socials,
                 customLinks: customs
             };
+
+            // IF tempImageBase64 exists, it means the user chose a new photo
+            if (tempImageBase64) {
+                upData.image = tempImageBase64;
+            }
             
             if (db) {
                 try {
                     await setDoc(doc(db, 'profiles', appIdPrefix), upData);
+                    tempImageBase64 = null; // Clear temp after successful save
                     window.toggleView('card');
                 } catch (err) {
-                    alert("Error saving to cloud. Data updated locally for this session.");
+                    alert("Error saving to cloud. Data updated locally.");
                     CONTACT_DATA = upData;
                     updateCardUI();
                     window.toggleView('card');
@@ -446,9 +455,6 @@
                 link.download = `Card_${CONTACT_DATA.name}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
-            }).catch(err => {
-                console.error("Download failed", err);
-                alert("Could not generate image. This often happens due to external image security (CORS).");
             });
         };
 
