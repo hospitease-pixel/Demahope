@@ -158,7 +158,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const PLATFORMS = {
@@ -242,17 +242,33 @@
         // Initialize App
         updateCardUI(); // Show default data immediately
 
+        // Ensure Auth before listeners
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth failed", e);
+            }
+        };
+        initAuth();
+
+        let unsubscribeSnapshot = null;
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main');
-                onSnapshot(docRef, (snap) => {
+                unsubscribeSnapshot = onSnapshot(docRef, (snap) => {
                     if (snap.exists()) {
                         CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
                         updateCardUI();
                     }
+                }, (error) => {
+                    console.error("Firestore error:", error);
                 });
-            } else {
-                signInAnonymously(auth);
             }
         });
 
@@ -303,6 +319,8 @@
         document.getElementById('addSocial').onclick = () => document.getElementById('socialsEditor').appendChild(createSocialItem());
 
         document.getElementById('saveEdit').onclick = async () => {
+            if (!auth.currentUser) return;
+            
             const phones = Array.from(document.querySelectorAll('.phone-input')).map(i => i.value.trim()).filter(v => v);
             const socials = Array.from(document.querySelectorAll('#socialsEditor > div')).map(d => ({
                 platform: d.querySelector('.social-platform').value,
@@ -321,8 +339,12 @@
                 socialLinks: socials
             };
 
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main'), up);
-            window.toggleView('card');
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main'), up);
+                window.toggleView('card');
+            } catch (e) {
+                console.error("Save failed", e);
+            }
         };
 
         // Actions
