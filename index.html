@@ -11,10 +11,6 @@
     <meta property="og:image" content="https://i.ibb.co/TMPW18jq/5855174764425579512.png" /> 
     <meta property="og:type" content="website" />
 
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://www.gstatic.com">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
@@ -25,7 +21,7 @@
         .contact-btn { transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .wave-background { background-color: #ffffff; position: relative; overflow: hidden; z-index: 1; border-bottom: 5px solid #3b82f6; }
-        .graph-pattern-background { background-color: #ffffff; }
+        .graph-pattern-background { background-color: #ffffff; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
         .strip-decoration { position: absolute; width: 450px; height: 10px; background-color: #1f2937; transform: rotate(-45deg); opacity: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .strip-ur-1 { top: -100px; right: -150px; z-index: 0; } 
         .strip-ur-2 { top: -60px; right: -110px; z-index: 0; } 
@@ -45,7 +41,6 @@
         .animate-watermark { animation: rotate 20s linear infinite; }
         .hidden-view { display: none !important; }
         #loadingOverlay { position: fixed; inset: 0; background: #111827; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }
-        
         input::placeholder { font-size: 0.875rem; color: #9ca3af; }
     </style>
 </head>
@@ -53,10 +48,13 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div class="flex flex-col items-center gap-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="text-white text-sm font-medium">Loading Card...</p>
+        </div>
     </div>
 
-    <!-- UI Components -->
+    <!-- Admin Access Trigger -->
     <button id="authBtn" class="fixed top-4 right-4 bg-gray-800/80 backdrop-blur-sm text-white p-2 rounded-full shadow-lg z-50 hover:bg-gray-700">
         <i data-lucide="lock" class="w-5 h-5"></i>
     </button>
@@ -84,7 +82,6 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Left Column: Identity -->
             <div class="space-y-4">
                 <h3 class="font-bold text-blue-600 border-b pb-1 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Identity</h3>
                 <div class="space-y-3">
@@ -104,9 +101,7 @@
                 </div>
             </div>
 
-            <!-- Right Column: Contacts & Links -->
             <div class="space-y-6">
-                <!-- Phone Numbers -->
                 <div>
                     <div class="flex justify-between items-center border-b pb-1 mb-3">
                         <h3 class="font-bold text-blue-600 flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> Phone Numbers</h3>
@@ -115,7 +110,6 @@
                     <div id="phonesEditor" class="space-y-2"></div>
                 </div>
 
-                <!-- Social Links -->
                 <div>
                     <div class="flex justify-between items-center border-b pb-1 mb-3">
                         <h3 class="font-bold text-blue-600 flex items-center gap-2"><i data-lucide="share-2" class="w-4 h-4"></i> Social Media</h3>
@@ -124,7 +118,6 @@
                     <div id="socialsEditor" class="space-y-2"></div>
                 </div>
 
-                <!-- Custom Links -->
                 <div>
                     <div class="flex justify-between items-center border-b pb-1 mb-3">
                         <h3 class="font-bold text-blue-600 flex items-center gap-2"><i data-lucide="link" class="w-4 h-4"></i> Custom Buttons</h3>
@@ -190,14 +183,21 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dema-hope-card';
+        // NOTE: Fill these with your actual Firebase Console values for Vercel deployment
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        let app, auth, db;
+        const appIdPrefix = "dema-hope-card";
 
         let CONTACT_DATA = {
             adminPassword: "Admin",
@@ -238,7 +238,6 @@
             document.getElementById('btn-website').href = CONTACT_DATA.website || '#';
             document.getElementById('btn-location').href = CONTACT_DATA.location || '#';
             
-            // Phone Buttons
             const phoneContainer = document.getElementById('phone-buttons-container');
             phoneContainer.innerHTML = (CONTACT_DATA.phones || []).map(num => num.trim() ? `
                 <a href="tel:${num.trim()}" class="contact-btn flex items-center justify-center p-3 bg-blue-600 text-white font-semibold rounded-lg">
@@ -246,11 +245,9 @@
                 </a>
             ` : "").join('');
 
-            // Email Action
             const btnContainer = document.getElementById('contact-buttons-container');
             btnContainer.innerHTML = CONTACT_DATA.email ? `<a href="mailto:${CONTACT_DATA.email}" class="contact-btn flex items-center justify-center p-3 bg-red-600 text-white font-semibold rounded-lg"><i data-lucide="mail" class="w-5 h-5 mr-2"></i>Send Email</a>` : "";
 
-            // Custom Links
             const customLinksContainer = document.getElementById('custom-links-container');
             customLinksContainer.innerHTML = (CONTACT_DATA.customLinks || []).map(link => `
                 <a href="${link.url}" target="_blank" class="contact-btn flex items-center justify-center p-3 bg-gray-800 text-white font-semibold rounded-lg">
@@ -258,7 +255,6 @@
                 </a>
             `).join('');
 
-            // Social Icons
             const socialContainer = document.getElementById('social-container');
             socialContainer.innerHTML = (CONTACT_DATA.socialLinks || []).map(social => {
                 const p = PLATFORMS[social.platform];
@@ -270,31 +266,37 @@
             document.getElementById('loadingOverlay').classList.add('hidden-view');
         }
 
-        // Fast render
-        updateCardUI();
-        
-        const startApp = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
+        // Initialize App with error safety
+        try {
+            if (firebaseConfig.apiKey) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                signInAnonymously(auth).catch(console.error);
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        const docRef = doc(db, 'profiles', appIdPrefix);
+                        onSnapshot(docRef, (snap) => {
+                            if (snap.exists()) {
+                                CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
+                                updateCardUI();
+                            }
+                        }, (err) => console.warn("Firestore access restricted or not configured yet."));
+                    }
+                });
             } else {
-                await signInAnonymously(auth);
+                console.warn("Firebase not configured. Using default static data.");
+                setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden-view'), 1000);
             }
+        } catch (e) {
+            console.error("Firebase init failed", e);
+        }
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main');
-                    onSnapshot(docRef, (snap) => {
-                        if (snap.exists()) {
-                            CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
-                            updateCardUI();
-                        }
-                    });
-                }
-            });
-        };
+        updateCardUI();
 
-        window.onload = startApp;
-
+        // Global functions for UI
         window.toggleView = (view) => {
             document.getElementById('cardView').classList.add('hidden-view');
             document.getElementById('loginView').classList.add('hidden-view');
@@ -312,18 +314,22 @@
                 loadEditForm();
                 window.toggleView('edit');
                 document.getElementById('loginPass').value = "";
-            } else alert("Incorrect password");
+            } else {
+                alert("Incorrect password");
+            }
         };
 
         document.getElementById('logoutBtn').onclick = () => window.toggleView('card');
 
-        // Editor Element Creators
+        // Form Management
+        window.removeParent = (btn) => btn.parentElement.remove();
+
         function createPhoneItem(val = "") {
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center";
             div.innerHTML = `
                 <input type="text" value="${val}" class="phone-input flex-1 p-2 border rounded text-sm" placeholder="+251...">
-                <button class="text-red-400 hover:text-red-600 px-2" onclick="this.parentElement.remove()">×</button>
+                <button class="text-red-400 hover:text-red-600 px-2" onclick="removeParent(this)">×</button>
             `;
             return div;
         }
@@ -336,7 +342,7 @@
             ).join('');
             
             div.innerHTML = `
-                <button class="absolute top-1 right-1 text-red-400 px-2" onclick="this.parentElement.remove()">×</button>
+                <button class="absolute top-1 right-1 text-red-400 px-2" onclick="removeParent(this)">×</button>
                 <select class="social-platform w-full p-2 border rounded text-xs font-bold">${options}</select>
                 <input type="text" value="${url}" class="social-url w-full p-2 border rounded text-xs" placeholder="Profile URL">
             `;
@@ -347,7 +353,7 @@
             const div = document.createElement('div');
             div.className = "p-3 bg-gray-50 rounded-xl border border-gray-100 space-y-2 relative";
             div.innerHTML = `
-                <button class="absolute top-1 right-1 text-red-400 px-2" onclick="this.parentElement.remove()">×</button>
+                <button class="absolute top-1 right-1 text-red-400 px-2" onclick="removeParent(this)">×</button>
                 <input type="text" value="${label}" class="custom-label w-full p-2 border rounded text-sm font-bold" placeholder="Label">
                 <input type="text" value="${url}" class="custom-url w-full p-2 border rounded text-xs" placeholder="URL">
             `;
@@ -416,22 +422,33 @@
                 customLinks: customs
             };
             
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main'), upData);
+            if (db) {
+                try {
+                    await setDoc(doc(db, 'profiles', appIdPrefix), upData);
+                    window.toggleView('card');
+                } catch (err) {
+                    alert("Error saving to cloud. Data updated locally for this session.");
+                    CONTACT_DATA = upData;
+                    updateCardUI();
+                    window.toggleView('card');
+                }
+            } else {
+                CONTACT_DATA = upData;
+                updateCardUI();
                 window.toggleView('card');
-            } catch (err) {
-                alert("Error saving data");
-                console.error(err);
             }
         };
 
         document.getElementById('downloadButton').onclick = () => {
             const el = document.getElementById('id-card-content');
-            html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
+            html2canvas(el, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Card_${CONTACT_DATA.name}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
+            }).catch(err => {
+                console.error("Download failed", err);
+                alert("Could not generate image. This often happens due to external image security (CORS).");
             });
         };
 
