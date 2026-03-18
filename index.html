@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Dema Hope - Chief Executive Officer | Digital Business Card</title>
+    <title>Dema Hope - Digital Business Card</title>
     
     <meta property="og:title" content="Dema Hope - Digital Business Card" />
-    <meta property="og:description" content="Digital Business Card for Chief Executive Officer of Dema Hope Real Estate. Elevate your life style ቅንጦት ይገባዎታል." />
+    <meta property="og:description" content="Digital Business Card for Dema Hope Real Estate. Elevate your life style ቅንጦት ይገባዎታል." />
     <meta property="og:image" content="https://i.ibb.co/TMPW18jq/5855174764425579512.png" /> 
-    <meta property="og:url" content="#" /> 
     <meta property="og:type" content="website" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -70,16 +69,6 @@
             color: white; 
         } 
 
-        .icon-facebook:hover { background-color: #166EDF; }
-        .icon-linkedin:hover { background-color: #004D99; }
-        .icon-telegram:hover { background-color: #1B88B9; }
-        .icon-whatsapp:hover { background-color: #333333; } 
-        .icon-instagram:hover { 
-            background: radial-gradient(circle at 30% 107%, #ffe082 0%, #ffe082 5%, #ff4d3d 45%, #c01e8c 60%, #3a4ee0 90%);
-        }
-        .icon-tiktok:hover { background-color: #333333; }
-        .icon-youtube:hover { background-color: #CC0000; }
-
         @keyframes rotate {
             0% { transform: scale(1.1) rotate(0deg); }
             100% { transform: scale(1.1) rotate(360deg); } 
@@ -96,6 +85,7 @@
         #id-card-content.is-capturing {
             transform: none !important; 
             position: relative !important; 
+            box-shadow: none !important;
         }
 
         .profile-container {
@@ -108,188 +98,266 @@
             transition: transform 0.3s ease-in-out; 
             object-position: 50% 50%; 
         }
+
+        .hidden-view { display: none; }
     </style>
 </head>
-<body class="min-h-screen p-4 py-8 bg-gray-900 flex justify-center items-start">
+<body class="min-h-screen bg-gray-900 flex flex-col items-center py-8 px-4">
+
+    <!-- Floating Auth Toggle -->
+    <button id="authBtn" class="fixed top-4 right-4 bg-gray-800 text-white p-2 rounded-full shadow-lg z-50 hover:bg-gray-700">
+        <i data-lucide="lock" class="w-5 h-5"></i>
+    </button>
 
     <div id="messageBox" class="fixed top-4 left-1/2 -translate-x-1/2 p-3 bg-gray-100 text-gray-700 rounded-lg text-sm text-center hidden z-50 transition-all duration-300 shadow-xl">
         Action completed.
     </div>
 
-    <div id="id-card-content" 
-          class="graph-pattern-background max-w-sm w-full mx-auto p-4 md:p-6 rounded-3xl 
-                 border-2 border-gray-200 
-                 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.7)] 
-                 transform transition-transform duration-500 hover:scale-[1.01] 
-                 relative overflow-hidden">
+    <!-- LOGIN SCREEN -->
+    <div id="loginView" class="hidden-view max-w-sm w-full bg-white p-8 rounded-3xl shadow-2xl mt-20">
+        <div class="flex flex-col items-center mb-6">
+            <div class="bg-blue-100 p-3 rounded-full mb-4">
+                <i data-lucide="user-check" class="w-8 h-8 text-blue-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Admin Access</h2>
+            <p class="text-sm text-gray-500">Sign in to edit your digital card</p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="loginPass" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            </div>
+            <button id="doLogin" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition-all active:scale-95">Sign In</button>
+            <button onclick="toggleView('card')" class="w-full text-gray-500 text-sm py-2 hover:text-gray-700">Go Back to Card</button>
+        </div>
+    </div>
+
+    <!-- EDIT SCREEN -->
+    <div id="editView" class="hidden-view max-w-2xl w-full bg-white p-8 rounded-3xl shadow-2xl my-8">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Edit Profile</h2>
+                <p class="text-sm text-gray-500">Update your information from your mobile</p>
+            </div>
+            <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-100 transition-colors">Logout</button>
+        </div>
         
-        <div class="wave-background absolute top-0 left-0 right-0 h-64 -mt-2 -mx-1 rounded-t-[1.5rem]">
-            <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center" style="top: -10%;">
-                <img id="businessLogo" 
-                    src="https://i.ibb.co/TMPW18jq/5855174764425579512.png" 
-                    alt="Dema Hope Real Estate Logo" 
-                    class="w-[90%] h-[90%] object-contain transition-opacity duration-300"
-                    onerror="this.onerror=null; this.src='https://placehold.co/160x80/1f2937/ffffff?text=LOGO';"
-                >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <h3 class="font-bold text-blue-600 flex items-center"><i data-lucide="user" class="w-4 h-4 mr-2"></i>Personal Info</h3>
+                
+                <!-- NEW PHOTO UPLOAD UI -->
+                <div class="p-4 bg-blue-50 rounded-xl border-2 border-dashed border-blue-200">
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-2">Profile Photo</label>
+                    <div class="flex items-center gap-4">
+                        <img id="editImgPreview" src="" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md">
+                        <div class="flex-1">
+                            <label for="imageUpload" class="cursor-pointer bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 inline-block">
+                                <i data-lucide="upload" class="w-4 h-4 inline mr-1"></i> Choose from Gallery
+                            </label>
+                            <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                            <p class="text-[10px] text-gray-500 mt-1">Accepts JPG, PNG from your phone</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Full Name</label>
+                    <input type="text" id="editName" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Organization</label>
+                    <input type="text" id="editOrg" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Job Title</label>
+                    <input type="text" id="editTitle" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold text-blue-600 flex items-center"><i data-lucide="phone" class="w-4 h-4 mr-2"></i>Contact Links</h3>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Primary Phone</label>
+                    <input type="text" id="editPhone" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">WhatsApp (Digits Only)</label>
+                    <input type="text" id="editWhatsapp" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Website URL</label>
+                    <input type="text" id="editWebsite" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Google Maps Link</label>
+                    <input type="text" id="editLocation" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Properties Link</label>
+                    <input type="text" id="editProperties" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-4 md:col-span-2">
+                <h3 class="font-bold text-blue-600 flex items-center"><i data-lucide="share-2" class="w-4 h-4 mr-2"></i>Social Media</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-semibold uppercase text-gray-400 mb-1">LinkedIn</label><input type="text" id="editLinkedin" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"></div>
+                    <div><label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Instagram</label><input type="text" id="editInstagram" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"></div>
+                    <div><label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Facebook</label><input type="text" id="editFacebook" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"></div>
+                    <div><label class="block text-xs font-semibold uppercase text-gray-400 mb-1">TikTok</label><input type="text" id="editTiktok" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"></div>
+                    <div><label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Telegram</label><input type="text" id="editTelegram" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"></div>
+                </div>
             </div>
         </div>
 
-        <div class="absolute inset-0 z-0 pointer-events-none flex justify-center items-center" style="top: -5%;">
-            <div class="absolute opacity-[0.30] animate-watermark w-full h-full flex justify-center items-center">
-                <img src="https://i.ibb.co/FLxSS6jt/5855174764425579514-1-removebg-preview.png" alt="Dema Hope Watermark" class="w-full h-full object-contain">
-            </div>
+        <div class="mt-8 pt-6 border-t flex flex-col md:flex-row gap-4">
+            <button id="saveEdit" class="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg active:scale-95 transition-all">Save Changes & Update Card</button>
+            <button onclick="toggleView('card')" class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-xl font-bold hover:bg-gray-200 transition-all">Discard Changes</button>
         </div>
+    </div>
 
-        <div class="strip-decoration strip-ur-1"></div>
-        <div class="strip-decoration strip-ur-2"></div>
-        <div class="strip-decoration strip-ur-3"></div>
-        <div class="strip-decoration strip-ll-1"></div>
-        <div class="strip-decoration strip-ll-2"></div>
-        <div class="strip-decoration strip-ll-3"></div>
-
-        <div class="relative z-10"> 
-            <div class="text-center mb-6 pt-36"> 
-                <div class="relative w-40 h-40 mx-auto rounded-full border-8 border-black/60 shadow-xl overflow-hidden profile-container">
-                    <img 
-                        id="profilePicture" 
-                        src="https://i.ibb.co/KxdB41Yw/590330395-122245334552174394-7170724954983779927-n.jpg" 
-                        alt="Dema Hope Profile Picture" 
-                        class="w-full h-full rounded-full object-cover"
-                        onerror="this.onerror=null; this.src='https://placehold.co/160x160/3b82f6/ffffff?text=ID';"
+    <!-- CARD VIEW -->
+    <div id="cardView" class="w-full flex flex-col items-center">
+        <div id="id-card-content" 
+              class="graph-pattern-background max-w-sm w-full mx-auto p-4 md:p-6 rounded-3xl 
+                     border-2 border-gray-200 
+                     shadow-[0_15px_30px_-5px_rgba(0,0,0,0.7)] 
+                     transform transition-transform duration-500 hover:scale-[1.01] 
+                     relative overflow-hidden mb-6">
+            
+            <div class="wave-background absolute top-0 left-0 right-0 h-64 -mt-2 -mx-1 rounded-t-[1.5rem]">
+                <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center" style="top: -10%;">
+                    <img id="businessLogo" 
+                        src="https://i.ibb.co/TMPW18jq/5855174764425579512.png" 
+                        alt="Logo" 
+                        class="w-[90%] h-[90%] object-contain transition-opacity duration-300"
+                        onerror="this.onerror=null; this.src='https://placehold.co/160x80/1f2937/ffffff?text=LOGO';"
                     >
                 </div>
-                
-                <h1 id="contactName" class="text-xl font-extrabold text-gray-900 mt-4">Dema Hope</h1>
-                <p id="contactOrg" class="text-xl font-semibold text-blue-600 mt-1">Dema Hope real estate</p>
-                <p id="contactTitle" class="text-lg font-bold text-gray-900 mt-2">Chief Executive Officer</p>
-                <p class="text-base italic text-gray-700 mt-1">Elevate your life style</p>
-                <p class="text-base italic text-gray-700 mt-1">ቅንጦት ይገባዎታል</p>
             </div>
 
-            <div class="space-y-3 mt-8">
-                <h2 class="text-lg font-bold text-gray-700 mb-2 border-b pb-2">Primary Contact</h2>
-                
-                <a href="tel:+251951515174" id="contactPhoneLink" class="contact-btn flex items-center justify-center p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
-                    <i data-lucide="phone" class="w-5 h-5 mr-2"></i>
-                    Call: 0951515174
-                </a>
-                
-                <a href="https://wa.me/251951515111" target="_blank" id="contactWhatsappLink" class="contact-btn flex items-center justify-center p-3 font-semibold rounded-lg shadow-lg icon-whatsapp">
-                    <i class="fa-brands fa-whatsapp text-2xl mr-2"></i>
-                    WhatsApp
-                </a>
-
-                <a href="sms:+251951515174" class="contact-btn flex items-center justify-center p-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800">
-                    <i data-lucide="message-square-text" class="w-5 h-5 mr-2"></i>
-                    Send SMS
-                </a>
-            </div>
-            
-            <div class="mt-6 border-t pt-6 border-gray-200">
-                <h2 class="text-lg font-bold text-gray-700 mb-3">Links & Social Media</h2>
-                
-                <div class="grid grid-cols-1 gap-3 mb-6">
-                    <a href="https://demahoperealestate.com/" target="_blank" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
-                        <i data-lucide="globe" class="w-5 h-5 mr-2"></i>
-                        Website
-                    </a>
-                    <a href="https://maps.app.goo.gl/66vQJ5azkoYCMTHJA" target="_blank" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
-                        <i data-lucide="map-pin" class="w-5 h-5 mr-2"></i>
-                        Location
-                    </a>
-                    <a href="https://share.google/UHPioNJukeWkHtDaS" target="_blank" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
-                        <i data-lucide="building-2" class="w-5 h-5 mr-2"></i>
-                        Properties
-                    </a>
-                </div>
-
-                <div class="flex flex-wrap justify-center gap-4"> 
-                    <a href="https://et.linkedin.com/company/demahoperealestate" target="_blank" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-linkedin">
-                        <i class="fa-brands fa-linkedin text-2xl"></i>
-                    </a>
-                    <a href="https://www.instagram.com/demahoperealestate" target="_blank" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-instagram">
-                        <i class="fa-brands fa-instagram text-2xl"></i>
-                    </a>
-                    <a href="https://www.facebook.com/demahoperealestatee" target="_blank" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-facebook">
-                        <i class="fa-brands fa-facebook text-2xl"></i>
-                    </a>
-                    <a href="https://vm.tiktok.com/ZMHTSWFmNKxNR-PNDd6/" target="_blank" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-tiktok">
-                        <i class="fa-brands fa-tiktok text-2xl"></i>
-                    </a>
-                    <a href="https://t.me/demahope" target="_blank" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-telegram">
-                        <i class="fa-brands fa-telegram text-2xl"></i>
-                    </a>
+            <div class="absolute inset-0 z-0 pointer-events-none flex justify-center items-center" style="top: -5%;">
+                <div class="absolute opacity-[0.30] animate-watermark w-full h-full flex justify-center items-center">
+                    <img src="https://i.ibb.co/FLxSS6jt/5855174764425579514-1-removebg-preview.png" alt="Watermark" class="w-full h-full object-contain">
                 </div>
             </div>
 
-            <div class="mt-8 space-y-3">
-                <button id="downloadButton" class="w-full flex items-center justify-center p-4 bg-blue-600 text-white font-bold rounded-xl shadow-xl hover:bg-blue-700 transition duration-300">
-                    <i data-lucide="download" class="w-6 h-6 mr-2"></i>
-                    Download Card Image
-                </button>
+            <div class="strip-decoration strip-ur-1"></div>
+            <div class="strip-decoration strip-ur-2"></div>
+            <div class="strip-decoration strip-ur-3"></div>
+            <div class="strip-decoration strip-ll-1"></div>
+            <div class="strip-decoration strip-ll-2"></div>
+            <div class="strip-decoration strip-ll-3"></div>
 
-                <button id="vcfButton" class="w-full flex items-center justify-center p-4 bg-black text-white font-bold rounded-xl shadow-xl hover:bg-gray-800 transition duration-300">
-                    <i data-lucide="address-book" class="w-6 h-6 mr-2"></i>
-                    Add to Contact (.vcf)
-                </button>
-            </div>
-        </div> 
+            <div class="relative z-10"> 
+                <div class="text-center mb-6 pt-36"> 
+                    <div class="relative w-40 h-40 mx-auto rounded-full border-8 border-black/60 shadow-xl overflow-hidden profile-container">
+                        <img 
+                            id="profilePicture" 
+                            src="https://i.ibb.co/KxdB41Yw/590330395-122245334552174394-7170724954983779927-n.jpg" 
+                            alt="Profile" 
+                            class="w-full h-full rounded-full object-cover"
+                            onerror="this.onerror=null; this.src='https://placehold.co/160x160/3b82f6/ffffff?text=ID';"
+                        >
+                    </div>
+                    
+                    <h1 id="display-name" class="text-xl font-extrabold text-gray-900 mt-4">Dema Hope</h1>
+                    <p id="display-org" class="text-xl font-semibold text-blue-600 mt-1">Dema Hope real estate</p>
+                    <p id="display-title" class="text-lg font-bold text-gray-900 mt-2">Chief Executive Officer</p>
+                    <p class="text-base italic text-gray-700 mt-1">Elevate your life style</p>
+                    <p class="text-base italic text-gray-700 mt-1">ቅንጦት ይገባዎታል</p>
+                </div>
+
+                <div class="space-y-3 mt-8">
+                    <h2 class="text-lg font-bold text-gray-700 mb-2 border-b pb-2">Primary Contact</h2>
+                    
+                    <a href="tel:+251951515174" id="btn-call" class="contact-btn flex items-center justify-center p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                        <i data-lucide="phone" class="w-5 h-5 mr-2"></i>
+                        <span>Call: 0951515174</span>
+                    </a>
+                    
+                    <a href="https://wa.me/251951515111" target="_blank" id="btn-whatsapp" class="contact-btn flex items-center justify-center p-3 font-semibold rounded-lg shadow-lg icon-whatsapp">
+                        <i class="fa-brands fa-whatsapp text-2xl mr-2"></i>
+                        WhatsApp
+                    </a>
+
+                    <a href="sms:+251951515174" id="btn-sms" class="contact-btn flex items-center justify-center p-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800">
+                        <i data-lucide="message-square-text" class="w-5 h-5 mr-2"></i>
+                        Send SMS
+                    </a>
+                </div>
+                
+                <div class="mt-6 border-t pt-6 border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-700 mb-3">Links & Social Media</h2>
+                    
+                    <div class="grid grid-cols-1 gap-3 mb-6">
+                        <a href="https://demahoperealestate.com/" target="_blank" id="btn-website" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
+                            <i data-lucide="globe" class="w-5 h-5 mr-2"></i>
+                            Website
+                        </a>
+                        <a href="https://maps.app.goo.gl/66vQJ5azkoYCMTHJA" target="_blank" id="btn-location" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
+                            <i data-lucide="map-pin" class="w-5 h-5 mr-2"></i>
+                            Location
+                        </a>
+                        <a href="https://share.google/UHPioNJukeWkHtDaS" target="_blank" id="btn-properties" class="contact-btn flex items-center justify-center p-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
+                            <i data-lucide="building-2" class="w-5 h-5 mr-2"></i>
+                            Properties
+                        </a>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-4"> 
+                        <a href="https://et.linkedin.com/company/demahoperealestate" target="_blank" id="btn-linkedin" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-linkedin">
+                            <i class="fa-brands fa-linkedin text-2xl"></i>
+                        </a>
+                        <a href="https://www.instagram.com/demahoperealestate" target="_blank" id="btn-instagram" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-instagram">
+                            <i class="fa-brands fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="https://www.facebook.com/demahoperealestatee" target="_blank" id="btn-facebook" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-facebook">
+                            <i class="fa-brands fa-facebook text-2xl"></i>
+                        </a>
+                        <a href="https://vm.tiktok.com/ZMHTSWFmNKxNR-PNDd6/" target="_blank" id="btn-tiktok" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-tiktok">
+                            <i class="fa-brands fa-tiktok text-2xl"></i>
+                        </a>
+                        <a href="https://t.me/demahope" target="_blank" id="btn-telegram" class="inline-flex items-center justify-center w-12 h-12 rounded-full transition duration-300 transform hover:scale-110 shadow-lg icon-telegram">
+                            <i class="fa-brands fa-telegram text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-3">
+                    <button id="downloadButton" class="w-full flex items-center justify-center p-4 bg-blue-600 text-white font-bold rounded-xl shadow-xl hover:bg-blue-700 transition duration-300">
+                        <i data-lucide="download" class="w-6 h-6 mr-2"></i>
+                        Download Card Image
+                    </button>
+
+                    <button id="vcfButton" class="w-full flex items-center justify-center p-4 bg-black text-white font-bold rounded-xl shadow-xl hover:bg-gray-800 transition duration-300">
+                        <i data-lucide="address-book" class="w-6 h-6 mr-2"></i>
+                        Add to Contact (.vcf)
+                    </button>
+                    
+                    <button onclick="toggleView('login')" id="profileButton" class="w-full flex items-center justify-center p-3 text-gray-500 hover:text-blue-600 transition-colors text-sm font-medium border-t border-gray-100 mt-4">
+                        <i data-lucide="settings" class="w-4 h-4 mr-2"></i>
+                        Manage Profile Login
+                    </button>
+                </div>
+            </div> 
+        </div>
+        
+        <p class="text-gray-500 text-xs mb-8">Generated for Dema Hope Real Estate</p>
     </div>
 
     <script>
         lucide.createIcons();
 
-        const messageBox = document.getElementById('messageBox');
-        
-        function showMessage(text, isError = false) {
-            messageBox.textContent = text;
-            messageBox.className = 'fixed top-4 left-1/2 -translate-x-1/2 p-3 rounded-lg text-sm text-center z-50 shadow-xl ' + 
-                                (isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700');
-            messageBox.classList.remove('hidden');
-            setTimeout(() => messageBox.classList.add('hidden'), 4000);
-        }
-
-        document.getElementById('downloadButton').addEventListener('click', () => {
-            const cardElement = document.getElementById('id-card-content');
-            const downloadButton = document.getElementById('downloadButton'); 
-            const vcfButton = document.getElementById('vcfButton');
-            
-            showMessage('Generating card image...'); 
-
-            downloadButton.style.visibility = 'hidden';
-            vcfButton.style.visibility = 'hidden';
-            cardElement.classList.add('is-capturing');
-
-            setTimeout(() => {
-                html2canvas(cardElement, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: null
-                }).then(canvas => {
-                    downloadButton.style.visibility = 'visible';
-                    vcfButton.style.visibility = 'visible';
-                    cardElement.classList.remove('is-capturing');
-
-                    const link = document.createElement('a');
-                    link.href = canvas.toDataURL('image/png');
-                    link.download = 'Dema_Hope_Digital_Card.png';
-                    link.click();
-                    showMessage('Downloaded successfully!');
-                }).catch(err => {
-                    downloadButton.style.visibility = 'visible';
-                    vcfButton.style.visibility = 'visible';
-                    cardElement.classList.remove('is-capturing');
-                    showMessage('Error generating image', true);
-                });
-            }, 500);
-        });
-
-        const CONTACT_DATA = {
+        // State Management
+        let CONTACT_DATA = {
             name: "Dema Hope",
             organization: "Dema Hope real estate", 
             title: "Chief Executive Officer",
+            image: "https://i.ibb.co/KxdB41Yw/590330395-122245334552174394-7170724954983779927-n.jpg",
             phone: "+251951515174",
-            whatsapp: "+251951515111",
+            whatsapp: "251951515111",
             website: "https://demahoperealestate.com/",
             location: "https://maps.app.goo.gl/66vQJ5azkoYCMTHJA",
             properties: "https://share.google/UHPioNJukeWkHtDaS",
@@ -302,73 +370,185 @@
             }
         };
 
+        const authState = { isLoggedIn: false };
+        let tempImageBase64 = null; // Store uploaded image before save
+
+        // Image Upload Logic
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    tempImageBase64 = event.target.result;
+                    document.getElementById('editImgPreview').src = tempImageBase64;
+                    showMessage("Image selected!");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Helper: Toggle views
+        function toggleView(view) {
+            document.getElementById('cardView').classList.add('hidden-view');
+            document.getElementById('loginView').classList.add('hidden-view');
+            document.getElementById('editView').classList.add('hidden-view');
+
+            if (view === 'login') {
+                if (authState.isLoggedIn) {
+                    document.getElementById('editView').classList.remove('hidden-view');
+                    loadEditForm();
+                } else {
+                    document.getElementById('loginView').classList.remove('hidden-view');
+                }
+            } else if (view === 'edit') {
+                document.getElementById('editView').classList.remove('hidden-view');
+                loadEditForm();
+            } else {
+                document.getElementById('cardView').classList.remove('hidden-view');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // Logic: Auth
+        document.getElementById('authBtn').addEventListener('click', () => {
+            if (authState.isLoggedIn) toggleView('edit');
+            else toggleView('login');
+        });
+
+        document.getElementById('doLogin').addEventListener('click', () => {
+            const pass = document.getElementById('loginPass').value;
+            if (pass === "Admin") {
+                authState.isLoggedIn = true;
+                document.getElementById('authBtn').innerHTML = '<i data-lucide="user-cog" class="w-5 h-5"></i>';
+                document.getElementById('profileButton').innerHTML = '<i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i> Manage Dashboard';
+                lucide.createIcons();
+                toggleView('edit');
+                showMessage("Admin access granted!");
+                document.getElementById('loginPass').value = "";
+            } else {
+                showMessage("Incorrect password.", true);
+            }
+        });
+
+        function logout() {
+            authState.isLoggedIn = false;
+            document.getElementById('authBtn').innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+            document.getElementById('profileButton').innerHTML = '<i data-lucide="settings" class="w-4 h-4 mr-2"></i> Manage Profile Login';
+            lucide.createIcons();
+            toggleView('card');
+            showMessage("Logged out.");
+        }
+
+        // Logic: Form Handling
+        function loadEditForm() {
+            document.getElementById('editName').value = CONTACT_DATA.name;
+            document.getElementById('editOrg').value = CONTACT_DATA.organization;
+            document.getElementById('editTitle').value = CONTACT_DATA.title;
+            document.getElementById('editImgPreview').src = CONTACT_DATA.image;
+            tempImageBase64 = CONTACT_DATA.image; // Initialize with current
+
+            document.getElementById('editPhone').value = CONTACT_DATA.phone;
+            document.getElementById('editWhatsapp').value = CONTACT_DATA.whatsapp;
+            document.getElementById('editWebsite').value = CONTACT_DATA.website;
+            document.getElementById('editLocation').value = CONTACT_DATA.location;
+            document.getElementById('editProperties').value = CONTACT_DATA.properties;
+            
+            document.getElementById('editLinkedin').value = CONTACT_DATA.socials.linkedin;
+            document.getElementById('editInstagram').value = CONTACT_DATA.socials.instagram;
+            document.getElementById('editFacebook').value = CONTACT_DATA.socials.facebook;
+            document.getElementById('editTiktok').value = CONTACT_DATA.socials.tiktok;
+            document.getElementById('editTelegram').value = CONTACT_DATA.socials.telegram;
+        }
+
+        document.getElementById('saveEdit').addEventListener('click', () => {
+            CONTACT_DATA.name = document.getElementById('editName').value;
+            CONTACT_DATA.organization = document.getElementById('editOrg').value;
+            CONTACT_DATA.title = document.getElementById('editTitle').value;
+            CONTACT_DATA.image = tempImageBase64 || CONTACT_DATA.image; // Use new or keep old
+            
+            CONTACT_DATA.phone = document.getElementById('editPhone').value;
+            CONTACT_DATA.whatsapp = document.getElementById('editWhatsapp').value;
+            CONTACT_DATA.website = document.getElementById('editWebsite').value;
+            CONTACT_DATA.location = document.getElementById('editLocation').value;
+            CONTACT_DATA.properties = document.getElementById('editProperties').value;
+            
+            CONTACT_DATA.socials.linkedin = document.getElementById('editLinkedin').value;
+            CONTACT_DATA.socials.instagram = document.getElementById('editInstagram').value;
+            CONTACT_DATA.socials.facebook = document.getElementById('editFacebook').value;
+            CONTACT_DATA.socials.tiktok = document.getElementById('editTiktok').value;
+            CONTACT_DATA.socials.telegram = document.getElementById('editTelegram').value;
+
+            updateCardUI();
+            toggleView('card');
+            showMessage("Profile updated!");
+        });
+
+        function updateCardUI() {
+            document.getElementById('display-name').innerText = CONTACT_DATA.name;
+            document.getElementById('display-org').innerText = CONTACT_DATA.organization;
+            document.getElementById('display-title').innerText = CONTACT_DATA.title;
+            document.getElementById('profilePicture').src = CONTACT_DATA.image;
+            
+            document.getElementById('btn-call').href = `tel:${CONTACT_DATA.phone}`;
+            document.getElementById('btn-call').querySelector('span').innerText = `Call: ${CONTACT_DATA.phone}`;
+            document.getElementById('btn-whatsapp').href = `https://wa.me/${CONTACT_DATA.whatsapp}`;
+            document.getElementById('btn-sms').href = `sms:${CONTACT_DATA.phone}`;
+            
+            document.getElementById('btn-website').href = CONTACT_DATA.website;
+            document.getElementById('btn-location').href = CONTACT_DATA.location;
+            document.getElementById('btn-properties').href = CONTACT_DATA.properties;
+            
+            document.getElementById('btn-linkedin').href = CONTACT_DATA.socials.linkedin;
+            document.getElementById('btn-instagram').href = CONTACT_DATA.socials.instagram;
+            document.getElementById('btn-facebook').href = CONTACT_DATA.socials.facebook;
+            document.getElementById('btn-tiktok').href = CONTACT_DATA.socials.tiktok;
+            document.getElementById('btn-telegram').href = CONTACT_DATA.socials.telegram;
+        }
+
+        function showMessage(text, isError = false) {
+            messageBox.textContent = text;
+            messageBox.className = 'fixed top-4 left-1/2 -translate-x-1/2 p-3 rounded-lg text-sm font-semibold text-center z-[100] shadow-2xl transition-all duration-300 ' + 
+                                (isError ? 'bg-red-600 text-white' : 'bg-green-600 text-white');
+            messageBox.classList.remove('hidden');
+            setTimeout(() => messageBox.classList.add('hidden'), 4000);
+        }
+
+        document.getElementById('downloadButton').addEventListener('click', () => {
+            const cardElement = document.getElementById('id-card-content');
+            const btns = [document.getElementById('downloadButton'), document.getElementById('vcfButton'), document.getElementById('profileButton'), document.getElementById('authBtn')];
+            
+            showMessage('Capturing card...'); 
+            btns.forEach(b => b.style.display = 'none');
+            cardElement.classList.add('is-capturing');
+
+            setTimeout(() => {
+                html2canvas(cardElement, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+                    btns.forEach(b => b.style.display = (b.id === 'authBtn') ? 'block' : 'flex');
+                    cardElement.classList.remove('is-capturing');
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = `${CONTACT_DATA.name}_Card.png`;
+                    link.click();
+                });
+            }, 600);
+        });
+
         document.getElementById('vcfButton').addEventListener('click', () => {
-            // Build the vCard string using standard grouping to ensure labels are honored
-            let vcf = "BEGIN:VCARD\n";
-            vcf += "VERSION:3.0\n";
-            vcf += `FN:${CONTACT_DATA.name}\n`;
-            vcf += `N:Hope;Dema;;;\n`;
-            vcf += `ORG:${CONTACT_DATA.organization}\n`;
-            vcf += `TITLE:${CONTACT_DATA.title}\n`;
+            let vcf = "BEGIN:VCARD\nVERSION:3.0\n";
+            vcf += `FN:${CONTACT_DATA.name}\nORG:${CONTACT_DATA.organization}\nTITLE:${CONTACT_DATA.title}\n`;
             vcf += `TEL;TYPE=CELL,VOICE:${CONTACT_DATA.phone}\n`;
-            vcf += `TEL;TYPE=WORK,VOICE:${CONTACT_DATA.whatsapp}\n`; 
-            
-            // Standard URL grouping (itemX.URL + itemX.X-ABLabel) 
-            // This is the most compatible way to show custom names instead of "website"
-            vcf += `item1.URL:${CONTACT_DATA.website}\n`;
-            vcf += `item1.X-ABLabel:Official Website\n`;
-
-            vcf += `item2.URL:${CONTACT_DATA.location}\n`;
-            vcf += `item2.X-ABLabel:Office Location\n`;
-
-            vcf += `item3.URL:${CONTACT_DATA.properties}\n`;
-            vcf += `item3.X-ABLabel:Properties\n`;
-
-            vcf += `item4.URL:${CONTACT_DATA.socials.linkedin}\n`;
-            vcf += `item4.X-ABLabel:LinkedIn\n`;
-
-            vcf += `item5.URL:${CONTACT_DATA.socials.instagram}\n`;
-            vcf += `item5.X-ABLabel:Instagram\n`;
-
-            vcf += `item6.URL:${CONTACT_DATA.socials.facebook}\n`;
-            vcf += `item6.X-ABLabel:Facebook\n`;
-
-            vcf += `item7.URL:${CONTACT_DATA.socials.tiktok}\n`;
-            vcf += `item7.X-ABLabel:TikTok\n`;
-
-            vcf += `item8.URL:${CONTACT_DATA.socials.telegram}\n`;
-            vcf += `item8.X-ABLabel:Telegram\n`;
-            
-            // Note field as fallback directory
-            let note = "DIRECTORY OF LINKS:\\n\\n";
-            note += `Main Website: ${CONTACT_DATA.website}\\n`;
-            note += `Office Location: ${CONTACT_DATA.location}\\n`;
-            note += `Property Listings: ${CONTACT_DATA.properties}\\n\\n`;
-            note += "SOCIAL MEDIA:\\n";
-            note += `LinkedIn: ${CONTACT_DATA.socials.linkedin}\\n`;
-            note += `Instagram: ${CONTACT_DATA.socials.instagram}\\n`;
-            note += `Facebook: ${CONTACT_DATA.socials.facebook}\\n`;
-            note += `TikTok: ${CONTACT_DATA.socials.tiktok}\\n`;
-            note += `Telegram: ${CONTACT_DATA.socials.telegram}\\n\\n`;
-            note += "Slogan: Elevate your life style ቅንጦት ይገባዎታል";
-            
-            vcf += `NOTE:${note}\n`;
+            vcf += `URL:${CONTACT_DATA.website}\n`;
             vcf += "END:VCARD";
-            
-            // Create and trigger download
-            const blob = new Blob([vcf], { type: 'text/vcard;charset=utf-8' });
+            const blob = new Blob([vcf], { type: 'text/vcard' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `${CONTACT_DATA.name.replace(/\s+/g, '_')}_Contact.vcf`;
-            
-            document.body.appendChild(link);
+            link.download = `${CONTACT_DATA.name}.vcf`;
             link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            
-            showMessage('Contact saved with custom link names!');
+            showMessage('Contact ready!');
         });
+
+        toggleView('card');
     </script>
 </body>
 </html>
