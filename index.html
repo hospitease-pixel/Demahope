@@ -7,27 +7,22 @@
     <title>Dema Hope - Digital Business Card</title>
     
     <meta property="og:title" content="Dema Hope - Digital Business Card" />
-    <meta property="og:description" content="Digital Business Card for Dema Hope Real Estate. Elevate your life style ቅንጦት ይገባዎታል." />
+    <meta property="og:description" content="Digital Business Card for Dema Hope Real Estate." />
     <meta property="og:image" content="https://i.ibb.co/TMPW18jq/5855174764425579512.png" /> 
     <meta property="og:type" content="website" />
 
-    <!-- Performance: Preconnect to CDNs -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://www.gstatic.com">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .contact-btn { transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .contact-btn:active { transform: scale(0.98); }
         .wave-background { background-color: #ffffff; position: relative; overflow: hidden; z-index: 1; border-bottom: 5px solid #3b82f6; }
         .graph-pattern-background { background-color: #ffffff; }
-        .strip-decoration { position: absolute; width: 450px; height: 10px; background-color: #1f2937; transform: rotate(-45deg); opacity: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .strip-decoration { position: absolute; width: 450px; height: 10px; background-color: #1f2937; transform: rotate(-45deg); opacity: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.3); pointer-events: none; }
         .strip-ur-1 { top: -100px; right: -150px; z-index: 0; } 
         .strip-ur-2 { top: -60px; right: -110px; z-index: 0; } 
         .strip-ll-1 { bottom: -100px; left: -150px; z-index: 5; } 
@@ -42,110 +37,28 @@
         .icon-youtube { background-color: #FF0000; color: white; } 
         .icon-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #405ded 90%); color: white; } 
         .icon-x-twitter { background-color: #000000; color: white; }
-        .icon-default { background-color: #4b5563; color: white; }
         
         @keyframes rotate { 0% { transform: scale(1.1) rotate(0deg); } 100% { transform: scale(1.1) rotate(360deg); } }
         .animate-watermark { animation: rotate 20s linear infinite; }
         .hidden-view { display: none !important; }
-        #loadingOverlay { position: fixed; inset: 0; background: #111827; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }
         
-        input::placeholder { font-size: 0.875rem; color: #9ca3af; }
+        /* Faster Loading: Hide overlay quickly */
+        #loadingOverlay { position: fixed; inset: 0; background: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-900 flex flex-col items-center py-8 px-4">
+<body class="min-h-screen bg-gray-900 flex flex-col items-center py-4 px-4">
 
-    <!-- Loading Overlay -->
+    <!-- Fast Loading Overlay -->
     <div id="loadingOverlay">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600"></div>
     </div>
 
-    <!-- UI Components -->
-    <button id="authBtn" class="fixed top-4 right-4 bg-gray-800/80 backdrop-blur-sm text-white p-2 rounded-full shadow-lg z-50 hover:bg-gray-700">
-        <i data-lucide="lock" class="w-5 h-5"></i>
+    <!-- Controls -->
+    <button id="authBtn" class="fixed top-4 right-4 bg-white/20 backdrop-blur-md text-white p-2 rounded-full shadow-lg z-50 hover:bg-white/30">
+        <i data-lucide="settings" class="w-5 h-5"></i>
     </button>
-    <div id="messageBox" class="fixed top-4 left-1/2 -translate-x-1/2 p-3 bg-gray-100 text-gray-700 rounded-lg text-sm text-center hidden z-[100] transition-all duration-300 shadow-xl"></div>
 
-    <!-- Login View -->
-    <div id="loginView" class="hidden-view max-w-sm w-full bg-white p-8 rounded-3xl shadow-2xl mt-20">
-        <div class="flex flex-col items-center mb-6">
-            <div class="bg-blue-100 p-3 rounded-full mb-4">
-                <i data-lucide="user-check" class="w-8 h-8 text-blue-600"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800">Admin Access</h2>
-        </div>
-        <div class="space-y-4">
-            <input type="password" id="loginPass" placeholder="Password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-            <button id="doLogin" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg">Sign In</button>
-            <button onclick="window.toggleView('card')" class="w-full text-gray-500 text-sm">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Edit View -->
-    <div id="editView" class="hidden-view max-w-4xl w-full bg-white p-8 rounded-3xl shadow-2xl my-8">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h2 class="text-2xl font-bold text-gray-800">Edit Profile</h2>
-            <button id="logoutBtn" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold">Logout</button>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Basic Info -->
-            <div class="space-y-3">
-                <h3 class="font-bold text-gray-700 border-b pb-1 uppercase text-xs">Identity</h3>
-                <label class="block text-[10px] font-bold uppercase text-gray-400">Profile Image</label>
-                <input type="file" id="imageUpload" accept="image/*" class="w-full text-xs">
-                <input type="text" id="editName" placeholder="Full Name" class="w-full p-2 border rounded text-sm">
-                <input type="text" id="editOrg" placeholder="Organization" class="w-full p-2 border rounded text-sm">
-                <input type="text" id="editTitle" placeholder="Job Title" class="w-full p-2 border rounded text-sm">
-                <input type="email" id="editEmail" placeholder="Email Address" class="w-full p-2 border rounded text-sm">
-                <input type="text" id="editWebsite" placeholder="Website URL" class="w-full p-2 border rounded text-sm">
-                <input type="text" id="editLocation" placeholder="Google Maps URL" class="w-full p-2 border rounded text-sm">
-                <input type="text" id="editWhatsapp" placeholder="WhatsApp Number (251...)" class="w-full p-2 border rounded text-sm">
-            </div>
-
-            <!-- Phone Numbers -->
-            <div class="space-y-3">
-                <div class="flex justify-between items-center border-b pb-1">
-                    <h3 class="font-bold text-gray-700 uppercase text-xs">Phone Numbers</h3>
-                    <button id="addPhone" class="text-blue-600 text-[10px] font-bold hover:underline">+ ADD PHONE</button>
-                </div>
-                <div id="phonesEditor" class="space-y-2">
-                    <!-- Phone inputs injected here -->
-                </div>
-            </div>
-
-            <!-- Social Links & Custom Links -->
-            <div class="space-y-6">
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center border-b pb-1">
-                        <h3 class="font-bold text-gray-700 uppercase text-xs">Social Presence</h3>
-                        <button id="addSocial" class="text-blue-600 text-[10px] font-bold hover:underline">+ ADD SOCIAL</button>
-                    </div>
-                    <div id="socialsEditor" class="space-y-2 max-h-64 overflow-y-auto pr-2">
-                        <!-- Social links injected here -->
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center border-b pb-1">
-                        <h3 class="font-bold text-gray-700 uppercase text-xs">Additional Links</h3>
-                        <button id="addCustomLink" class="text-blue-600 text-[10px] font-bold hover:underline">+ ADD LINK</button>
-                    </div>
-                    <div id="customLinksEditor" class="space-y-2 max-h-48 overflow-y-auto pr-2">
-                        <!-- Custom links inputs here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-6 pt-4 border-t">
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Security</label>
-            <input type="password" id="editPassword" placeholder="New Admin Password" class="w-full md:w-1/3 p-2 border rounded text-sm">
-        </div>
-
-        <button id="saveEdit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-6 shadow-xl hover:bg-blue-700 transition-colors">Save All Changes</button>
-    </div>
-
-    <!-- Card View -->
+    <!-- Card View (Shown by default) -->
     <div id="cardView" class="w-full flex flex-col items-center">
         <div id="id-card-content" class="graph-pattern-background max-w-sm w-full mx-auto p-4 md:p-6 rounded-3xl border-2 border-gray-200 shadow-2xl relative overflow-hidden mb-6">
             <div class="wave-background absolute top-0 left-0 right-0 h-64 -mt-2 -mx-1 rounded-t-[1.5rem]">
@@ -165,22 +78,20 @@
 
             <div class="relative z-10 pt-40"> 
                 <div class="text-center mb-6"> 
-                    <div class="relative w-36 h-36 mx-auto rounded-full border-4 border-black/80 shadow-xl overflow-hidden bg-white">
+                    <div class="relative w-32 h-32 mx-auto rounded-full border-4 border-black/80 shadow-xl overflow-hidden bg-white">
                         <img id="profilePicture" src="https://i.ibb.co/KxdB41Yw/590330395-122245334552174394-7170724954983779927-n.jpg" alt="Profile" class="w-full h-full object-cover">
                     </div>
-                    <h1 id="display-name" class="text-xl font-extrabold text-gray-900 mt-4">Dema Hope</h1>
-                    <p id="display-org" class="text-lg font-bold text-blue-600">Dema Hope real estate</p>
-                    <p id="display-title" class="text-md font-semibold text-gray-800">Chief Executive Officer</p>
+                    <h1 id="display-name" class="text-xl font-extrabold text-gray-900 mt-4">...</h1>
+                    <p id="display-org" class="text-lg font-bold text-blue-600">...</p>
+                    <p id="display-title" class="text-md font-semibold text-gray-800">...</p>
                     <p class="text-sm italic text-gray-600 mt-1">Elevate your life style | ቅንጦት ይገባዎታል</p>
                 </div>
 
-                <div class="mt-4 border-t border-b py-4">
+                <div class="mt-4 border-t border-b border-gray-100 py-4">
                     <div id="social-container" class="flex flex-wrap justify-center gap-3"></div>
                 </div>
 
-                <!-- Phone buttons section -->
                 <div id="phone-buttons-container" class="space-y-3 mt-6"></div>
-                
                 <div id="contact-buttons-container" class="space-y-3 mt-3"></div>
                 <div id="custom-links-container" class="space-y-3 mt-3"></div>
 
@@ -189,24 +100,66 @@
                     <a href="#" target="_blank" id="btn-location" class="flex-1 flex items-center justify-center p-3 bg-gray-100 rounded-lg text-sm font-bold"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>Location</a>
                 </div>
 
-                <div class="mt-8 space-y-3">
-                    <button id="downloadButton" class="w-full flex items-center justify-center p-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-colors">Download Card</button>
-                    <button id="vcfButton" class="w-full flex items-center justify-center p-4 bg-black text-white font-bold rounded-xl shadow-lg hover:bg-gray-900 transition-colors">Save Contact</button>
+                <div class="mt-8 space-y-3 pb-4">
+                    <button id="downloadButton" class="w-full flex items-center justify-center p-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg">Download Card</button>
+                    <button id="vcfButton" class="w-full flex items-center justify-center p-4 bg-black text-white font-bold rounded-xl shadow-lg">Save Contact</button>
                 </div>
             </div> 
         </div>
     </div>
 
+    <!-- Login View -->
+    <div id="loginView" class="hidden-view max-w-sm w-full bg-white p-8 rounded-3xl shadow-2xl mt-10">
+        <h2 class="text-xl font-bold mb-4">Admin Login</h2>
+        <input type="password" id="loginPass" placeholder="Password" class="w-full px-4 py-3 border rounded-xl mb-4">
+        <button id="doLogin" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Sign In</button>
+        <button onclick="toggleView('card')" class="w-full mt-2 text-gray-500 text-sm">Cancel</button>
+    </div>
+
+    <!-- Edit View -->
+    <div id="editView" class="hidden-view max-w-4xl w-full bg-white p-6 rounded-3xl shadow-2xl my-4 overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Edit Profile</h2>
+            <button onclick="toggleView('card')" class="text-gray-500">Close</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3">
+                <label class="text-xs font-bold text-gray-400">IDENTITY</label>
+                <input type="file" id="imageUpload" accept="image/*" class="w-full text-xs">
+                <input type="text" id="editName" placeholder="Full Name" class="w-full p-2 border rounded">
+                <input type="text" id="editOrg" placeholder="Organization" class="w-full p-2 border rounded">
+                <input type="text" id="editTitle" placeholder="Job Title" class="w-full p-2 border rounded">
+                <input type="email" id="editEmail" placeholder="Email" class="w-full p-2 border rounded">
+                <input type="text" id="editWebsite" placeholder="Website" class="w-full p-2 border rounded">
+                <input type="text" id="editLocation" placeholder="Location URL" class="w-full p-2 border rounded">
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-xs font-bold text-gray-400">PHONE NUMBERS</span>
+                        <button id="addPhone" class="text-blue-600 text-xs">+ ADD</button>
+                    </div>
+                    <div id="phonesEditor" class="space-y-2"></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-xs font-bold text-gray-400">SOCIAL LINKS</span>
+                        <button id="addSocial" class="text-blue-600 text-xs">+ ADD</button>
+                    </div>
+                    <div id="socialsEditor" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <button id="saveEdit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-8">Save Changes</button>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dema-hope-card';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const PLATFORMS = {
             linkedin: { label: 'LinkedIn', icon: 'fa-linkedin', class: 'icon-linkedin' },
@@ -229,7 +182,6 @@
             whatsapp: "251951515111",
             website: "https://demahoperealestate.com/",
             location: "https://maps.app.goo.gl/66vQJ5azkoYCMTHJA",
-            // Changed structure to an array for dynamic socials
             socialLinks: [
                 { platform: 'linkedin', url: 'https://et.linkedin.com/company/demahoperealestate' },
                 { platform: 'instagram', url: 'https://www.instagram.com/demahoperealestate' },
@@ -239,6 +191,12 @@
             ],
             customLinks: []
         };
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dema-hope-card';
 
         function updateCardUI() {
             document.getElementById('display-name').textContent = CONTACT_DATA.name;
@@ -250,268 +208,142 @@
             
             // Phone Buttons
             const phoneContainer = document.getElementById('phone-buttons-container');
-            phoneContainer.innerHTML = "";
-            if(CONTACT_DATA.phones && Array.isArray(CONTACT_DATA.phones)) {
-                CONTACT_DATA.phones.forEach(num => {
-                    if(num.trim()) {
-                        phoneContainer.innerHTML += `<a href="tel:${num.trim()}" class="contact-btn flex items-center justify-center p-3 bg-blue-600 text-white font-semibold rounded-lg"><i data-lucide="phone" class="w-5 h-5 mr-2"></i>Call: ${num.trim()}</a>`;
-                    }
-                });
-            }
+            phoneContainer.innerHTML = (CONTACT_DATA.phones || []).map(num => `
+                <a href="tel:${num.trim()}" class="contact-btn flex items-center justify-center p-3 bg-blue-600 text-white font-semibold rounded-lg">
+                    <i data-lucide="phone" class="w-5 h-5 mr-2"></i>Call: ${num.trim()}
+                </a>
+            `).join('');
 
+            // Core Actions
             const btnContainer = document.getElementById('contact-buttons-container');
-            btnContainer.innerHTML = "";
-            if(CONTACT_DATA.email) btnContainer.innerHTML += `<a href="mailto:${CONTACT_DATA.email}" class="contact-btn flex items-center justify-center p-3 bg-red-600 text-white font-semibold rounded-lg"><i data-lucide="mail" class="w-5 h-5 mr-2"></i>Send Email</a>`;
-            if(CONTACT_DATA.whatsapp) btnContainer.innerHTML += `<a href="https://wa.me/${CONTACT_DATA.whatsapp}" target="_blank" class="contact-btn flex items-center justify-center p-3 icon-whatsapp font-semibold rounded-lg"><i class="fa-brands fa-whatsapp text-2xl mr-2"></i>WhatsApp</a>`;
-
-            const customLinksContainer = document.getElementById('custom-links-container');
-            customLinksContainer.innerHTML = "";
-            if (CONTACT_DATA.customLinks && Array.isArray(CONTACT_DATA.customLinks)) {
-                CONTACT_DATA.customLinks.forEach(link => {
-                    if (link.label && link.url) {
-                        customLinksContainer.innerHTML += `<a href="${link.url}" target="_blank" class="contact-btn flex items-center justify-center p-3 bg-gray-800 text-white font-semibold rounded-lg"><i data-lucide="external-link" class="w-5 h-5 mr-2 text-blue-400"></i>${link.label}</a>`;
-                    }
-                });
-            }
-
-            const socialContainer = document.getElementById('social-container');
-            socialContainer.innerHTML = "";
-            if (CONTACT_DATA.socialLinks && Array.isArray(CONTACT_DATA.socialLinks)) {
-                CONTACT_DATA.socialLinks.forEach(social => {
-                    const platform = PLATFORMS[social.platform];
-                    if (platform && social.url && social.url.trim()) {
-                        socialContainer.innerHTML += `<a href="${social.url}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full shadow-md ${platform.class} transform hover:scale-110 transition-transform"><i class="fa-brands ${platform.icon} text-xl"></i></a>`;
-                    }
-                });
-            }
-            lucide.createIcons();
-        }
-
-        const startApp = async () => {
-            setTimeout(() => {
-                document.getElementById('loadingOverlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden-view'), 300);
-            }, 1000);
-
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main');
-                    onSnapshot(docRef, (snap) => {
-                        if (snap.exists()) {
-                            const data = snap.data();
-                            
-                            // Compatibility Layer: Migrate old 'socials' object to 'socialLinks' array
-                            if (data.socials && !data.socialLinks) {
-                                data.socialLinks = Object.entries(data.socials)
-                                    .filter(([p, url]) => url && url.trim() !== "")
-                                    .map(([p, url]) => ({ platform: p, url: url }));
-                            }
-                            
-                            CONTACT_DATA = { ...CONTACT_DATA, ...data };
-                            updateCardUI();
-                        }
-                    });
-                }
-            });
-        };
-
-        window.onload = startApp;
-
-        window.toggleView = (view) => {
-            document.getElementById('cardView').classList.add('hidden-view');
-            document.getElementById('loginView').classList.add('hidden-view');
-            document.getElementById('editView').classList.add('hidden-view');
-            if (view === 'edit') document.getElementById('editView').classList.remove('hidden-view');
-            else if (view === 'login') document.getElementById('loginView').classList.remove('hidden-view');
-            else document.getElementById('cardView').classList.remove('hidden-view');
-            window.scrollTo(0,0);
-        };
-
-        document.getElementById('authBtn').onclick = () => window.toggleView('login');
-        
-        document.getElementById('doLogin').onclick = () => {
-            if (document.getElementById('loginPass').value === CONTACT_DATA.adminPassword) {
-                window.toggleView('edit');
-                loadEditForm();
-                document.getElementById('loginPass').value = "";
-            } else alert("Incorrect password");
-        };
-
-        document.getElementById('logoutBtn').onclick = () => window.toggleView('card');
-
-        // Builders
-        function createPhoneItem(value = "") {
-            const div = document.createElement('div');
-            div.className = "phone-item flex gap-2 items-center";
-            div.innerHTML = `
-                <input type="text" placeholder="+251..." class="phone-input flex-1 p-2 border rounded text-sm" value="${value}">
-                <button class="remove-phone text-red-500 hover:bg-red-50 p-1 rounded">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-            `;
-            div.querySelector('.remove-phone').onclick = () => div.remove();
-            return div;
-        }
-
-        function createSocialItem(platform = "linkedin", url = "") {
-            const div = document.createElement('div');
-            div.className = "social-item flex flex-col gap-1 p-2 bg-gray-50 rounded-lg border border-gray-200 relative";
-            let options = Object.entries(PLATFORMS).map(([k,v]) => `<option value="${k}" ${k === platform ? 'selected' : ''}>${v.label}</option>`).join('');
-            
-            div.innerHTML = `
-                <button class="remove-social absolute top-1 right-1 text-red-400 hover:text-red-600">
-                    <i data-lucide="x-circle" class="w-4 h-4"></i>
-                </button>
-                <select class="social-platform w-full p-1 border rounded text-xs font-bold bg-white">${options}</select>
-                <input type="text" placeholder="Profile URL" class="social-url w-full p-1 border rounded text-[10px]" value="${url}">
-            `;
-            div.querySelector('.remove-social').onclick = () => div.remove();
-            return div;
-        }
-
-        function createCustomLinkItem(label = "", url = "") {
-            const div = document.createElement('div');
-            div.className = "custom-link-item space-y-1 p-2 bg-gray-50 rounded-lg border border-gray-200 relative";
-            div.innerHTML = `
-                <button class="remove-link absolute top-1 right-1 text-red-400 hover:text-red-600">
-                    <i data-lucide="x-circle" class="w-4 h-4"></i>
-                </button>
-                <input type="text" placeholder="Label" class="custom-label w-full p-1 border rounded text-xs font-bold" value="${label}">
-                <input type="text" placeholder="URL" class="custom-url w-full p-1 border rounded text-[10px]" value="${url}">
-            `;
-            div.querySelector('.remove-link').onclick = () => div.remove();
-            return div;
-        }
-
-        // Add Handlers
-        document.getElementById('addPhone').onclick = () => {
-            document.getElementById('phonesEditor').appendChild(createPhoneItem());
-            lucide.createIcons();
-        };
-
-        document.getElementById('addSocial').onclick = () => {
-            document.getElementById('socialsEditor').appendChild(createSocialItem());
-            lucide.createIcons();
-        };
-
-        document.getElementById('addCustomLink').onclick = () => {
-            document.getElementById('customLinksEditor').appendChild(createCustomLinkItem());
-            lucide.createIcons();
-        };
-
-        function loadEditForm() {
-            document.getElementById('editName').value = CONTACT_DATA.name || "";
-            document.getElementById('editOrg').value = CONTACT_DATA.organization || "";
-            document.getElementById('editTitle').value = CONTACT_DATA.title || "";
-            document.getElementById('editEmail').value = CONTACT_DATA.email || "";
-            document.getElementById('editWhatsapp').value = CONTACT_DATA.whatsapp || "";
-            document.getElementById('editWebsite').value = CONTACT_DATA.website || "";
-            document.getElementById('editLocation').value = CONTACT_DATA.location || "";
-            document.getElementById('editPassword').value = CONTACT_DATA.adminPassword || "";
-            
-            // Phones
-            const phoneEditor = document.getElementById('phonesEditor');
-            phoneEditor.innerHTML = "";
-            if (CONTACT_DATA.phones && Array.isArray(CONTACT_DATA.phones)) {
-                CONTACT_DATA.phones.forEach(p => phoneEditor.appendChild(createPhoneItem(p)));
-            }
-            if (phoneEditor.children.length === 0) phoneEditor.appendChild(createPhoneItem());
+            let actions = "";
+            if(CONTACT_DATA.email) actions += `<a href="mailto:${CONTACT_DATA.email}" class="contact-btn flex items-center justify-center p-3 bg-red-600 text-white font-semibold rounded-lg"><i data-lucide="mail" class="w-5 h-5 mr-2"></i>Send Email</a>`;
+            if(CONTACT_DATA.whatsapp) actions += `<a href="https://wa.me/${CONTACT_DATA.whatsapp}" target="_blank" class="contact-btn flex items-center justify-center p-3 icon-whatsapp font-semibold rounded-lg"><i class="fa-brands fa-whatsapp text-2xl mr-2"></i>WhatsApp</a>`;
+            btnContainer.innerHTML = actions;
 
             // Socials
-            const socialEditor = document.getElementById('socialsEditor');
-            socialEditor.innerHTML = "";
-            if (CONTACT_DATA.socialLinks && Array.isArray(CONTACT_DATA.socialLinks)) {
-                CONTACT_DATA.socialLinks.forEach(s => socialEditor.appendChild(createSocialItem(s.platform, s.url)));
-            }
-            
-            // Custom Links
-            const editor = document.getElementById('customLinksEditor');
-            editor.innerHTML = "";
-            if (CONTACT_DATA.customLinks && Array.isArray(CONTACT_DATA.customLinks)) {
-                CONTACT_DATA.customLinks.forEach(link => editor.appendChild(createCustomLinkItem(link.label, link.url)));
-            }
+            const socialContainer = document.getElementById('social-container');
+            socialContainer.innerHTML = (CONTACT_DATA.socialLinks || []).map(social => {
+                const p = PLATFORMS[social.platform];
+                return p ? `<a href="${social.url}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full shadow-md ${p.class}"><i class="fa-brands ${p.icon} text-xl"></i></a>` : "";
+            }).join('');
+
             lucide.createIcons();
+            // Hide loader as soon as UI is ready
+            document.getElementById('loadingOverlay').classList.add('hidden-view');
         }
 
-        let tempImageBase64 = null;
-        document.getElementById('imageUpload').onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => tempImageBase64 = event.target.result;
-                reader.readAsDataURL(file);
-            }
+        // Global functions
+        window.toggleView = (view) => {
+            ['cardView', 'loginView', 'editView'].forEach(id => document.getElementById(id).classList.add('hidden-view'));
+            document.getElementById(view + 'View').classList.remove('hidden-view');
         };
+
+        // Initialize App
+        updateCardUI(); // Show default data immediately
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main');
+                onSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
+                        updateCardUI();
+                    }
+                });
+            } else {
+                signInAnonymously(auth);
+            }
+        });
+
+        // Edit Mode Logic
+        document.getElementById('authBtn').onclick = () => window.toggleView('login');
+        document.getElementById('doLogin').onclick = () => {
+            if (document.getElementById('loginPass').value === CONTACT_DATA.adminPassword) {
+                loadEditForm();
+                window.toggleView('edit');
+            } else alert("Access Denied");
+        };
+
+        function createPhoneItem(val = "") {
+            const d = document.createElement('div');
+            d.className = "flex gap-2";
+            d.innerHTML = `<input type="text" value="${val}" class="phone-input flex-1 p-2 border rounded text-sm"><button onclick="this.parentElement.remove()" class="text-red-500">×</button>`;
+            return d;
+        }
+
+        function createSocialItem(plat = "facebook", url = "") {
+            const d = document.createElement('div');
+            d.className = "p-2 bg-gray-50 rounded space-y-1 relative";
+            let opts = Object.entries(PLATFORMS).map(([k,v]) => `<option value="${k}" ${k===plat?'selected':''}>${v.label}</option>`).join('');
+            d.innerHTML = `<select class="social-platform w-full p-1 text-xs">${opts}</select>
+                           <input type="text" value="${url}" placeholder="URL" class="social-url w-full p-1 text-xs border rounded">
+                           <button onclick="this.parentElement.remove()" class="absolute top-0 right-1 text-red-500">×</button>`;
+            return d;
+        }
+
+        function loadEditForm() {
+            document.getElementById('editName').value = CONTACT_DATA.name;
+            document.getElementById('editOrg').value = CONTACT_DATA.organization;
+            document.getElementById('editTitle').value = CONTACT_DATA.title;
+            document.getElementById('editEmail').value = CONTACT_DATA.email;
+            document.getElementById('editWebsite').value = CONTACT_DATA.website;
+            document.getElementById('editLocation').value = CONTACT_DATA.location;
+            
+            const pEditor = document.getElementById('phonesEditor');
+            pEditor.innerHTML = "";
+            (CONTACT_DATA.phones || []).forEach(p => pEditor.appendChild(createPhoneItem(p)));
+            
+            const sEditor = document.getElementById('socialsEditor');
+            sEditor.innerHTML = "";
+            (CONTACT_DATA.socialLinks || []).forEach(s => sEditor.appendChild(createSocialItem(s.platform, s.url)));
+        }
+
+        document.getElementById('addPhone').onclick = () => document.getElementById('phonesEditor').appendChild(createPhoneItem());
+        document.getElementById('addSocial').onclick = () => document.getElementById('socialsEditor').appendChild(createSocialItem());
 
         document.getElementById('saveEdit').onclick = async () => {
             const phones = Array.from(document.querySelectorAll('.phone-input')).map(i => i.value.trim()).filter(v => v);
-            
-            const socialLinks = [];
-            document.querySelectorAll('.social-item').forEach(item => {
-                const platform = item.querySelector('.social-platform').value;
-                const url = item.querySelector('.social-url').value.trim();
-                if (url) socialLinks.push({ platform, url });
-            });
+            const socials = Array.from(document.querySelectorAll('#socialsEditor > div')).map(d => ({
+                platform: d.querySelector('.social-platform').value,
+                url: d.querySelector('.social-url').value.trim()
+            })).filter(s => s.url);
 
-            const customLinks = [];
-            document.querySelectorAll('.custom-link-item').forEach(item => {
-                const label = item.querySelector('.custom-label').value.trim();
-                const url = item.querySelector('.custom-url').value.trim();
-                if (label && url) customLinks.push({ label, url });
-            });
-
-            const upData = {
+            const up = {
+                ...CONTACT_DATA,
                 name: document.getElementById('editName').value,
                 organization: document.getElementById('editOrg').value,
                 title: document.getElementById('editTitle').value,
-                phones: phones,
                 email: document.getElementById('editEmail').value,
-                whatsapp: document.getElementById('editWhatsapp').value,
                 website: document.getElementById('editWebsite').value,
                 location: document.getElementById('editLocation').value,
-                adminPassword: document.getElementById('editPassword').value || CONTACT_DATA.adminPassword,
-                image: tempImageBase64 || CONTACT_DATA.image,
-                socialLinks: socialLinks,
-                customLinks: customLinks
+                phones: phones,
+                socialLinks: socials
             };
-            
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main');
-                await setDoc(docRef, upData);
-                window.toggleView('card');
-            } catch (err) {
-                alert("Error saving data");
-                console.error(err);
-            }
+
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profile', 'main'), up);
+            window.toggleView('card');
+        };
+
+        // Actions
+        document.getElementById('vcfButton').onclick = () => {
+            let v = `BEGIN:VCARD\nVERSION:3.0\nFN:${CONTACT_DATA.name}\nORG:${CONTACT_DATA.organization}\nTITLE:${CONTACT_DATA.title}\n`;
+            (CONTACT_DATA.phones || []).forEach(p => v += `TEL:${p}\n`);
+            v += `EMAIL:${CONTACT_DATA.email}\nEND:VCARD`;
+            const b = new Blob([v], {type:'text/vcard'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = "contact.vcf";
+            a.click();
         };
 
         document.getElementById('downloadButton').onclick = () => {
-            const el = document.getElementById('id-card-content');
-            html2canvas(el, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Card_${CONTACT_DATA.name}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
+            html2canvas(document.getElementById('id-card-content'), { useCORS: true }).then(c => {
+                const l = document.createElement('a');
+                l.download = "business_card.png";
+                l.href = c.toDataURL();
+                l.click();
             });
-        };
-
-        document.getElementById('vcfButton').onclick = () => {
-            let vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${CONTACT_DATA.name}\nORG:${CONTACT_DATA.organization}\nTITLE:${CONTACT_DATA.title}\n`;
-            if(CONTACT_DATA.phones) {
-                CONTACT_DATA.phones.forEach(p => vcf += `TEL;TYPE=CELL:${p}\n`);
-            }
-            vcf += `EMAIL:${CONTACT_DATA.email}\nURL:${CONTACT_DATA.website}\nEND:VCARD`;
-            const blob = new Blob([vcf], { type: 'text/vcard' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${CONTACT_DATA.name}.vcf`;
-            link.click();
         };
     </script>
 </body>
