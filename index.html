@@ -186,19 +186,21 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // PLACE YOUR FIREBASE CONFIG HERE TO SAVE PERMANENTLY ACROSS DEVICES
+        // --- FIREBASE CONFIGURATION ---
+        // To sync changes across all devices, please fill in your project details from the Firebase Console (Project Settings > General).
         const firebaseConfig = {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: ""
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         let app, auth, db;
-        const appIdPrefix = "dema-hope-card-v1"; // Unique key for your card
+        const appIdPrefix = "dema-hope-card-v1"; // Unique key for your card document
 
+        // Default local data (used as fallback or initial setup)
         let CONTACT_DATA = {
             adminPassword: "Admin",
             name: "Dema Hope",
@@ -266,35 +268,48 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        // Initialize App
-        if (firebaseConfig.apiKey) {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
+        // --- Initialization ---
+        const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
 
-            signInAnonymously(auth).then(() => {
-                const docRef = doc(db, 'profiles', appIdPrefix);
-                onSnapshot(docRef, (snap) => {
-                    if (snap.exists()) {
-                        CONTACT_DATA = snap.data();
+        if (isConfigValid) {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                signInAnonymously(auth).then(() => {
+                    const docRef = doc(db, 'profiles', appIdPrefix);
+                    // Real-time listener for cross-device sync
+                    onSnapshot(docRef, (snap) => {
+                        if (snap.exists()) {
+                            CONTACT_DATA = snap.data();
+                            updateCardUI();
+                        } else {
+                            // First time setup: push current/default data to cloud
+                            setDoc(docRef, CONTACT_DATA);
+                            updateCardUI();
+                        }
+                    }, (error) => {
+                        console.error("Firestore Listener Error:", error);
                         updateCardUI();
-                    } else {
-                        // First time setup - save defaults
-                        setDoc(docRef, CONTACT_DATA);
-                        updateCardUI();
-                    }
+                    });
+                }).catch(e => {
+                    console.error("Firebase Auth failed:", e);
+                    updateCardUI();
                 });
-            }).catch(e => {
-                console.error("Firebase auth failed:", e);
+            } catch (initError) {
+                console.error("Firebase Initialization Error:", initError);
                 updateCardUI();
-            });
+            }
         } else {
-            // Local mode fallback
+            // Local mode fallback if no keys are provided
+            console.warn("Firebase config not found. Using local browser storage.");
             const saved = localStorage.getItem('dema_hope_local_storage');
             if (saved) CONTACT_DATA = JSON.parse(saved);
             setTimeout(updateCardUI, 500);
         }
 
+        // --- View Management ---
         window.toggleView = (view) => {
             document.getElementById('cardView').classList.add('hidden-view');
             document.getElementById('loginView').classList.add('hidden-view');
@@ -321,6 +336,7 @@
 
         window.removeParent = (btn) => btn.parentElement.remove();
 
+        // --- Editor Item Builders ---
         function createPhoneItem(val = "") {
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center";
@@ -395,6 +411,7 @@
             }
         };
 
+        // --- Save Logic ---
         document.getElementById('saveEdit').onclick = async () => {
             const upData = {
                 ...CONTACT_DATA,
@@ -424,10 +441,11 @@
             if (db) {
                 try {
                     await setDoc(doc(db, 'profiles', appIdPrefix), upData);
-                    alert("Changes saved to cloud!");
+                    alert("Changes saved to cloud! All users will see updates.");
                     window.toggleView('card');
                 } catch (err) {
-                    alert("Failed to save to cloud. Saved locally instead.");
+                    console.error("Cloud Save Failed:", err);
+                    alert("Failed to save to cloud. Saved to this browser only.");
                     localStorage.setItem('dema_hope_local_storage', JSON.stringify(upData));
                     CONTACT_DATA = upData;
                     updateCardUI();
@@ -437,11 +455,12 @@
                 localStorage.setItem('dema_hope_local_storage', JSON.stringify(upData));
                 CONTACT_DATA = upData;
                 updateCardUI();
-                alert("Changes saved locally!");
+                alert("Saved locally! (Connect Firebase for global sync)");
                 window.toggleView('card');
             }
         };
 
+        // --- Export Tools ---
         document.getElementById('downloadButton').onclick = () => {
             const el = document.getElementById('id-card-content');
             html2canvas(el, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
