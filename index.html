@@ -41,12 +41,10 @@
         .animate-watermark { animation: rotate 20s linear infinite; }
         .hidden-view { display: none !important; }
         #loadingOverlay { position: fixed; inset: 0; background: #111827; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }
-        input::placeholder { font-size: 0.875rem; color: #9ca3af; }
     </style>
 </head>
 <body class="min-h-screen bg-gray-900 flex flex-col items-center py-8 px-4">
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay">
         <div class="flex flex-col items-center gap-4">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -186,9 +184,9 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // NOTE: Fill these with your actual Firebase Console values for Vercel deployment
+        // PLACE YOUR FIREBASE CONFIG HERE TO SAVE PERMANENTLY ACROSS DEVICES
         const firebaseConfig = {
             apiKey: "",
             authDomain: "",
@@ -199,7 +197,7 @@
         };
 
         let app, auth, db;
-        const appIdPrefix = "dema-hope-card";
+        const appIdPrefix = "dema-hope-card-v1"; // Unique key for your card
 
         let CONTACT_DATA = {
             adminPassword: "Admin",
@@ -265,34 +263,37 @@
             }).join('');
 
             lucide.createIcons();
-            document.getElementById('loadingOverlay').classList.add('hidden-view');
+            document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        try {
-            if (firebaseConfig.apiKey) {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                signInAnonymously(auth).catch(console.error);
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        const docRef = doc(db, 'profiles', appIdPrefix);
-                        onSnapshot(docRef, (snap) => {
-                            if (snap.exists()) {
-                                CONTACT_DATA = { ...CONTACT_DATA, ...snap.data() };
-                                updateCardUI();
-                            }
-                        }, (err) => console.warn("Firestore access error"));
+        // Initialize App
+        if (firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            signInAnonymously(auth).then(() => {
+                const docRef = doc(db, 'profiles', appIdPrefix);
+                onSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        CONTACT_DATA = snap.data();
+                        updateCardUI();
+                    } else {
+                        // First time setup - save defaults
+                        setDoc(docRef, CONTACT_DATA);
+                        updateCardUI();
                     }
                 });
-            } else {
-                setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden-view'), 1000);
-            }
-        } catch (e) {
-            console.error(e);
+            }).catch(e => {
+                console.error("Firebase auth failed:", e);
+                updateCardUI();
+            });
+        } else {
+            // Local mode fallback
+            const saved = localStorage.getItem('dema_hope_local_storage');
+            if (saved) CONTACT_DATA = JSON.parse(saved);
+            setTimeout(updateCardUI, 500);
         }
-
-        updateCardUI();
 
         window.toggleView = (view) => {
             document.getElementById('cardView').classList.add('hidden-view');
@@ -360,6 +361,8 @@
         document.getElementById('addSocial').onclick = () => document.getElementById('socialsEditor').appendChild(createSocialItem());
         document.getElementById('addCustomLink').onclick = () => document.getElementById('customLinksEditor').appendChild(createCustomLinkItem());
 
+        let tempImageBase64 = null;
+
         function loadEditForm() {
             document.getElementById('editName').value = CONTACT_DATA.name || "";
             document.getElementById('editOrg').value = CONTACT_DATA.organization || "";
@@ -370,21 +373,15 @@
             document.getElementById('editPassword').value = CONTACT_DATA.adminPassword || "";
             document.getElementById('editImagePreview').src = CONTACT_DATA.image || "";
             
-            const phonesEditor = document.getElementById('phonesEditor');
-            phonesEditor.innerHTML = "";
-            (CONTACT_DATA.phones || []).forEach(p => phonesEditor.appendChild(createPhoneItem(p)));
+            document.getElementById('phonesEditor').innerHTML = "";
+            (CONTACT_DATA.phones || []).forEach(p => document.getElementById('phonesEditor').appendChild(createPhoneItem(p)));
 
-            const socialsEditor = document.getElementById('socialsEditor');
-            socialsEditor.innerHTML = "";
-            (CONTACT_DATA.socialLinks || []).forEach(s => socialsEditor.appendChild(createSocialItem(s.platform, s.url)));
+            document.getElementById('socialsEditor').innerHTML = "";
+            (CONTACT_DATA.socialLinks || []).forEach(s => document.getElementById('socialsEditor').appendChild(createSocialItem(s.platform, s.url)));
 
-            const customEditor = document.getElementById('customLinksEditor');
-            customEditor.innerHTML = "";
-            (CONTACT_DATA.customLinks || []).forEach(l => customEditor.appendChild(createCustomLinkItem(l.label, l.url)));
+            document.getElementById('customLinksEditor').innerHTML = "";
+            (CONTACT_DATA.customLinks || []).forEach(l => document.getElementById('customLinksEditor').appendChild(createCustomLinkItem(l.label, l.url)));
         }
-
-        // Global variable to hold the new image string
-        let tempImageBase64 = null;
 
         document.getElementById('imageUpload').onchange = (e) => {
             const file = e.target.files[0];
@@ -392,7 +389,6 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     tempImageBase64 = event.target.result;
-                    // Update preview in the editor immediately
                     document.getElementById('editImagePreview').src = tempImageBase64;
                 };
                 reader.readAsDataURL(file);
@@ -400,50 +396,48 @@
         };
 
         document.getElementById('saveEdit').onclick = async () => {
-            const phones = Array.from(document.querySelectorAll('.phone-input')).map(i => i.value.trim()).filter(v => v);
-            const socials = Array.from(document.querySelectorAll('#socialsEditor > div')).map(div => ({
-                platform: div.querySelector('.social-platform').value,
-                url: div.querySelector('.social-url').value.trim()
-            })).filter(s => s.url);
-            const customs = Array.from(document.querySelectorAll('#customLinksEditor > div')).map(div => ({
-                label: div.querySelector('.custom-label').value.trim(),
-                url: div.querySelector('.custom-url').value.trim()
-            })).filter(l => l.label && l.url);
-
-            // Create the updated data object
             const upData = {
                 ...CONTACT_DATA,
-                name: document.getElementById('editName').value,
-                organization: document.getElementById('editOrg').value,
-                title: document.getElementById('editTitle').value,
-                email: document.getElementById('editEmail').value,
-                website: document.getElementById('editWebsite').value,
-                location: document.getElementById('editLocation').value,
-                adminPassword: document.getElementById('editPassword').value || CONTACT_DATA.adminPassword,
-                phones: phones,
-                socialLinks: socials,
-                customLinks: customs
+                name: document.getElementById('editName').value.trim(),
+                organization: document.getElementById('editOrg').value.trim(),
+                title: document.getElementById('editTitle').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                website: document.getElementById('editWebsite').value.trim(),
+                location: document.getElementById('editLocation').value.trim(),
+                adminPassword: document.getElementById('editPassword').value.trim() || CONTACT_DATA.adminPassword,
+                phones: Array.from(document.querySelectorAll('.phone-input')).map(i => i.value.trim()).filter(v => v),
+                socialLinks: Array.from(document.querySelectorAll('#socialsEditor > div')).map(div => ({
+                    platform: div.querySelector('.social-platform').value,
+                    url: div.querySelector('.social-url').value.trim()
+                })).filter(s => s.url),
+                customLinks: Array.from(document.querySelectorAll('#customLinksEditor > div')).map(div => ({
+                    label: div.querySelector('.custom-label').value.trim(),
+                    url: div.querySelector('.custom-url').value.trim()
+                })).filter(l => l.label && l.url)
             };
 
-            // IF tempImageBase64 exists, it means the user chose a new photo
             if (tempImageBase64) {
                 upData.image = tempImageBase64;
+                tempImageBase64 = null;
             }
-            
+
             if (db) {
                 try {
                     await setDoc(doc(db, 'profiles', appIdPrefix), upData);
-                    tempImageBase64 = null; // Clear temp after successful save
+                    alert("Changes saved to cloud!");
                     window.toggleView('card');
                 } catch (err) {
-                    alert("Error saving to cloud. Data updated locally.");
+                    alert("Failed to save to cloud. Saved locally instead.");
+                    localStorage.setItem('dema_hope_local_storage', JSON.stringify(upData));
                     CONTACT_DATA = upData;
                     updateCardUI();
                     window.toggleView('card');
                 }
             } else {
+                localStorage.setItem('dema_hope_local_storage', JSON.stringify(upData));
                 CONTACT_DATA = upData;
                 updateCardUI();
+                alert("Changes saved locally!");
                 window.toggleView('card');
             }
         };
